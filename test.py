@@ -49,21 +49,73 @@
 #     p.close()
 #     p.join()
 #############################################
-# partial增加第三方类实例的属性
-from functools import partial
-from socketserver import StreamRequestHandler, TCPServer
+# # partial增加第三方类实例的属性
+# from functools import partial
+# from socketserver import StreamRequestHandler, TCPServer
 
 
-class EchoHandler(StreamRequestHandler):
-    # 重写init,增加一个必传的ack强制关键字
-    def __init__(self, *args, ack, **kwargs):
-        self.ack = ack
-        super().__init__(*args, **kwargs)
+# class EchoHandler(StreamRequestHandler):
+#     # 重写init,增加一个必传的ack强制关键字
+#     def __init__(self, *args, ack, **kwargs):
+#         self.ack = ack
+#         super().__init__(*args, **kwargs)
 
-    def handle(self):
-        for line in self.rfile:
-            self.wfile.write(b'GOT:' + line)
+#     def handle(self):
+#         for line in self.rfile:
+#             self.wfile.write(b'GOT:' + line)
 
 
-serv = TCPServer(('', 15000), partial(EchoHandler, ack=b"RECIEVED:"))
-serv.serve_forever()
+# serv = TCPServer(('', 15000), partial(EchoHandler, ack=b"RECIEVED:"))
+# serv.serve_forever()
+######################
+# # 回调函数获取信息
+# def apply_async(func, *args, callback):
+#     # Compute the result
+#     result = func(*args)
+
+#     # Invoke the callback with the result
+#     callback(result)
+
+
+# # def print_result(result):
+# #     print('Got:', result)
+
+
+# # # 注意到 回调print_result() 函数仅仅只接受一个参数 result 。不能再传入其他信息。
+# # apply_async(sum, (2, 3), callback=print_result)
+
+# # # 为了让回调函数访问外部信息，一种方法是使用类储存信息(方法可以获取内部的state)。
+# # # 第二种方式，作为类的替代，可以使用一个闭包捕获状态值(useState钩子)。
+# # def handler_wrapper():
+# #     state = 0
+
+# #     def handler(result):
+# #         # 注意：不加nonlocal则不是闭包
+# #         # state = 0
+# #         nonlocal state
+# #         state += 1
+# #         print('[{}] Got: {}'.format(state, result))
+
+# #     return handler
+
+
+# # handler = handler_wrapper()
+# # apply_async(sum, (2, 3), callback=handler)
+# # apply_async(sum, (2, 3), callback=handler)
+
+# # 还有另外一个更高级的方法，可以使用协程来完成同样的事情：
+# def make_handler():
+#     sequence = 0
+#     while True:
+#         result = yield
+#         sequence += 1
+#         print('[{}] Got: {}'.format(sequence, result))
+
+
+# handler = make_handler()
+
+# # 激活生成器
+# next(handler)
+# apply_async(sum, (2, 3), callback=handler.send)
+
+##############
