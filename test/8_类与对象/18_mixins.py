@@ -6,6 +6,9 @@
 
 
 # 混入类都没有实例变量，因为直接实例化混入类没有任何意义
+from collections import defaultdict
+
+
 class LoggedMappingMixin:
     """
     Add logging to get/set/delete operations for debugging.
@@ -53,10 +56,43 @@ class StringKeysMappingMixin:
 
 
 # 这里的super到底是是什么
-class LoggedDict(LoggedMappingMixin, dict):
+class SetOnceDefaultDict(SetOnceMappingMixin, defaultdict):
     pass
 
 
-d = LoggedDict()
+d = SetOnceDefaultDict(list)
+d['x'].append(2)
+d['x'].append(3)
+d['x'] = 23
 
-d['x'] = 22
+# 混入类在标准库中很多地方都出现过,比如django
+# 当你编写网络代码时候， 你会经常使用 socketserver 模块中的 ThreadingMixIn 来给其他网络相关类增加多线程支持。
+
+# 还有一种实现混入类的方式就是使用类装饰器,而且不再需要使用多继承了
+def LoggedMapping(cls):
+    """第二种方式：使用类装饰器"""
+    cls_getitem = cls.__getitem__
+    cls_setitem = cls.__setitem__
+    cls_delitem = cls.__delitem__
+
+    def __getitem__(self, key):
+        print('Getting ' + str(key))
+        return cls_getitem(self, key)
+
+    def __setitem__(self, key, value):
+        print('Setting {} = {!r}'.format(key, value))
+        return cls_setitem(self, key, value)
+
+    def __delitem__(self, key):
+        print('Deleting ' + str(key))
+        return cls_delitem(self, key)
+
+    cls.__getitem__ = __getitem__
+    cls.__setitem__ = __setitem__
+    cls.__delitem__ = __delitem__
+    return cls
+
+
+@LoggedMapping
+class LoggedDict(dict):
+    pass

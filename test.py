@@ -119,3 +119,7 @@
 # apply_async(sum, (2, 3), callback=handler.send)
 
 ##############
+print([(i, j) for i in range(3) for j in range(i)])
+print(list(enumerate(["a", "b", "c"], start=2)))
+# isinstance可以接收一个元组¶
+print(isinstance("1.3", (float, int, str)))

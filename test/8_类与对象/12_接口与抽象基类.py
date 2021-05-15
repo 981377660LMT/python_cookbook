@@ -12,11 +12,11 @@ import collections
 class IStream(metaclass=ABCMeta):
     @abstractmethod
     def read(self, maxbytes=-1):
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def write(self, data):
-        pass
+        raise NotImplementedError()
 
 
 class MyStream(IStream):

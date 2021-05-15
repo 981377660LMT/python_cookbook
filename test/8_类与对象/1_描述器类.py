@@ -77,4 +77,10 @@ class Point:
 # __get__() 如果一个描述器被当做一个实例变量来访问，那么 instance 参数是实例对象，cls是instance的类
 p = Point(2, 3)
 print(p.x)
-print(Point.x)
+print(Point.x
+
+# 如果一个对象同时定义了 __get__() 和 __set__(),它叫做资料描述器(data descriptor)。
+# 仅定义了 __get__() 的描述器叫非资料描述器(常用于方法，当然其他用途也是可以的)
+
+a = {}
+print('a' not in a)
