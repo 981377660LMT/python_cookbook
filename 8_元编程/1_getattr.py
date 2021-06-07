@@ -1,5 +1,5 @@
 # __getattr__, __getattribute__
-# __getattr__ 就是在查找不到属性的时候调用
+# __getattr__ 就是在查找不到对象属性的时候调用
 from datetime import date
 
 

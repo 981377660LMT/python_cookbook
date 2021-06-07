@@ -162,6 +162,270 @@
    ```
 
    三个属性描述符(PropertyDescriptor)：**get**,**set**,**delete**
-   属性查找顺序：。。。
+   一个类只要实现任一个方法，那这个类就是属性描述符
 
-   元类：
+   属性查找顺序:
+   如果 user 是某个类的实例，那么 user.age（以及等价的 getattr(user,’age’)）
+   首先调用**getattribute**。如果类定义了**getattr**方法，
+   那么在**getattribute**抛出 AttributeError 的时候就会调用到**getattr**，
+   而对于描述符(**get**）的调用，则是发生在**getattribute**内部的。
+   user = User(), 那么 user.age 顺序如下：
+
+<!-- 1.先找数据描述符：这是个好特性 -->
+
+（1）如果“age”是出现在 User 或其基类的**dict**中， 且 age 是 data descriptor， 那么调用其**get**方法, 否则
+
+<!-- 2.再找实例的__dict__ -->
+
+（2）如果“age”出现在 user 的**dict**中， 那么直接返回 obj.**dict**[‘age’]， 否则
+
+<!-- 3.再找类的__dict__ -->
+
+（3）如果“age”出现在 User 或其基类的**dict**中
+
+（3.1）如果 age 是 non-data descriptor，那么调用其**get**方法， 否则
+
+（3.2）返回 **dict**[‘age’]
+
+<!--4. 找不到则getattr -->
+
+（4）如果 User 有**getattr**方法，调用**getattr**方法，否则
+
+<!--5. 抛出错误 -->
+
+（5）抛出 AttributeError
+
+new 和 init:用于框架重写
+
+```py
+class User:
+    def __new__(cls, *args, **kwargs):
+        print(" in new ")
+        return super().__new__(cls)
+
+    def __init__(self, name):
+        print(" in init")
+        pass
+
+
+a = int()
+# new 是用来控制对象的生成过程， 在对象生成之前
+# init是用来完善对象的
+# 如果new方法不返回对象， 则不会调用init函数
+if __name__ == "__main__":
+    user = User(name="bobby")
+
+
+
+
+元类：
+# 元类是创建类的东西
+def say(self):
+    return "i am user"
+    # return self.name
+
+Base = type("User", (object,), {'name': 'cmnx', 'say': say})
+User = type("User", (Base,), {})
+
+另一种写法：metaclass=''
+所有metaclass都必须继承type类
+class MetaClassShouldExtendsType(type):
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls, *args, **kwargs)
+元类可以控制类生成的过程
+# python中类的生成过程，会首先向上寻找metaclass，通过metaclass去创建类
+# 找不到则用type创建类,调用type.__new__()
+class MetaUser(metaclass=MetaClassShouldExtendsType):
+    pass
+用法;metaclass=ABCMeta
+ABCMeta重写了__new__函数，在返回实例self前进行属性检查，是否实现了抽象方法等
+
+orm实现
+
+
+
+7.iterable与iterator
+iterable里面有__iter__
+iterator里卖弄有__next__
+迭代器和以下标的访问方式不一样， 迭代器是不能返回的, 迭代器提供了一种惰性方式数据的方式
+
+生成器读取大文件
+in 定位到对的__iter__ 找不到则__getitem__
+from collections.abc import Iterator
+
+class Company(object):
+    def __init__(self, employee_list):
+        self.employee = employee_list
+
+    def __iter__(self):
+        return MyIterator(self.employee)
+
+    # def __getitem__(self, item):
+    #     return self.employee[item]
+
+
+class MyIterator(Iterator):
+    def __init__(self, employee_list):
+        self.iter_list = employee_list
+        self.index = 0
+
+    def __next__(self):
+        #真正返回迭代值的逻辑
+        try:
+            word = self.iter_list[self.index]
+        except IndexError:
+            raise StopIteration
+        self.index += 1
+        return word
+
+生成器generator 里卖弄有__next__
+# 生成器函数，函数里只要有yield关键字
+# 生成器推导式(i for i in range(10))
+# 生成器对象， python编译字节码的时候就产生了，
+
+def gen_fib(index):
+    n, a, b = 0, 0, 1
+    while n < index:
+        yield b
+        a, b = b, a + b
+        n += 1
+
+
+for data in gen_fib(10):
+    print(data)
+# print (gen_fib(10))
+# 斐波拉契 0 1 1 2 3 5 8
+# 惰性求值， 延迟求值提供了可能
+
+生成器原理：Heap Memory
+# python一切皆对象，栈帧对象， 字节码对象
+# 当foo调用子函数 bar， 又会创建一个栈帧
+# 所有的栈帧都是分配在堆内存上，这就决定了栈帧可以独立于调用者存在
+# 任何地方都可以调用生成器对象
+# 上次的调用结果保存在堆里
+# g.gi_frame.f_lasti保存上一次的位置
+# g.gi_frame.f_locals保存生成器局部变量
+
+def gen_func():
+    yield 1
+    name = "bobby"
+    yield 2
+    age = 30
+    return "imooc"
+
+
+g = gen_func()
+
+print(g.__next__(), g.gi_frame.f_lasti, g.gi_frame.f_locals)
+print(g.__next__(), g.gi_frame.f_lasti, g.gi_frame.f_locals)
+print(g.__next__(), g.gi_frame.f_lasti, g.gi_frame.f_locals)
+# 1 2 {}
+# 2 12 {'name': 'bobby'}
+# Traceback (most recent call last):
+#   File "e:\test\python\python基础\py高级\AdvancePython-master\9_迭代器生成器.py\6_gen_test.py", line 13, in <module>
+#     print(g.__next__(), g.gi_frame.f_lasti, g.gi_frame.f_locals)
+# StopIteration: imooc
+
+JS的生成器函数
+function* gen() {
+  const a = yield 1
+  // return为迭代器的最后一次迭代（当done等于时true）提供返回值。
+  return a * 2
+}
+
+const g = gen()
+
+// console.log(g.next())
+// console.log(g.next(3))
+
+// # 如果使用for ... of循环或类似方法通过迭代器进行迭代Array.from，则该return值将被忽略
+for (const item of g) {
+  console.log(item)
+}
+
+生成器应用：读取500G大文件：只有一行，内存放不下
+# 500G, 特殊 一行
+def myreadlines(f, newline):
+    """读取大文件
+
+    Args:
+        f (TextIOWrapper): 文件句柄
+        newline (str): 分隔符
+
+    Yields:
+        list: buff字段
+    """
+    buf = ""
+    while True:
+        while newline in buf:
+            pos = buf.index(newline)
+            yield buf[:pos]
+            buf = buf[pos + len(newline) :]
+        chunk = f.read(30)
+
+        if not chunk:
+            # 说明已经读到了文件结尾
+            yield buf
+            break
+        buf += chunk
+
+
+# f.read()里可以传size限制
+with open("input.txt") as f:
+    for line in myreadlines(f, "{|}"):
+        print(line)
+
+8.socket编程
+操作系统为我们提供了操作传输层协议的api socket
+
+9.多进程多线程编程
+# gil会根据执行的字节码行数以及时间片释放gil，gil在遇到io的操作时候主动释放
+
+线程通信方法:共享全局变量；Queue，线程安全
+线程变量同步方法:Lock/RLokc;Condition;Semaphore;Event
+Lock & RLock：互斥锁，用来保证多线程访问共享变量的问题
+Semaphore对象：Lock互斥锁的加强版，可以被多个线程同时拥有，而Lock只能被某一个线程同时拥有。
+Event对象：它是线程间通信的方式，相当于信号，一个线程可以给另外一个线程发送信号后让其执行操作。
+Condition对象：其可以在某些事件触发或者达到特定的条件后才处理数据
+原文链接：https://blog.csdn.net/brucewong0516/article/details/81050939
+# 调用acquire([timeout])时，线程将一直阻塞，
+# 直到获得锁定或者直到timeout秒后（timeout参数可选）。
+# 返回是否获得锁。
+# 1. 用锁必然会影响性能
+# 2. 锁会引起死锁(同一个线程或者不同线程竞争同一把锁)
+RLock可重入的锁
+# 在同一个线程里面，可以连续调用多次acquire， 一定要注意acquire的次数要和release的次数相等，否则死锁
+Condition条件变量：对接古诗
+# 条件变量， 用于复杂的线程间同步
+发布与订阅：
+Condition.notify()
+Condition.wait()
+
+Condition.acquire()  (enter时调用acquire方法，即RLock的acquire)
+Condition.release()  (exit时调用release方法，即RLock的release)
+ # 启动顺序很重要
+    # 在调用with cond之后才能调用wait或者notify方法
+    # condition有两层锁， 一把底层锁会在线程调用了wait方法的时候释放， 上面的锁会在每次调用wait的时候分配一把并放入到cond的等待队列中，等到notify方法的唤醒
+Condition对象维护了一个锁（Lock/RLock)和一个waiting池。
+class XiaoAi(threading.Thread):
+    def __init__(self, cond):
+        super().__init__(name="小爱")
+        self.cond = cond
+
+    def run(self):
+        # acquire获得Condition对象的锁
+        # Condition对象的构造函数可以接受一个Lock/RLock对象作为参数，如果没有指定，则Condition对象会在内部自行创建一个RLock
+        with self.cond:
+            # 调用wait方法时，线程会释放Condition内部的锁并进入blocked状态，同时在waiting池中记录这个线程
+            self.cond.wait()
+            print("{} : 在 ".format(self.name))
+            # 当调用notify方法时，Condition对象会从waiting池中挑选一个线程，通知其调用acquire方法尝试取到锁
+            # 处于waiting池的线程只能通过notify方法唤醒
+            self.cond.notify()
+
+
+Semaphore信号量
+# Semaphore 是用于控制进入数量的锁
+# 文件， 读、写， 写一般只是用于一个线程写，读可以允许有多个
+# 限制爬虫数量
+```
