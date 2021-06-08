@@ -13,11 +13,13 @@ class GraphSearch:
         path = path or []
 
         path.append(start)
+        # 退出条件
         if start == end:
             return path
         for node in self.graph.get(start, []):
             if node not in path:
                 newpath = self.find_path_dfs(node, end, path[:])
+                # 找到了就返回
                 if newpath:
                     return newpath
 
