@@ -47,6 +47,7 @@ if __name__ == "__main__":
     thread1.start()
     thread2.start()
 
+    # 阻塞主线程
     thread1.join()
     thread2.join()
 

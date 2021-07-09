@@ -2,6 +2,7 @@
 # #fork只能用于linux/unix中
 # pid = os.fork()
 # print("bobby")
+# 子进程pid为0
 # if pid == 0:
 #   print('子进程 {} ，父进程是： {}.' .format(os.getpid(), os.getppid()))
 # else:
@@ -10,8 +11,10 @@
 
 import multiprocessing
 
-#多进程编程
+# 多进程编程
 import time
+
+
 def get_html(n):
     time.sleep(n)
     print("sub_progress success")
@@ -26,7 +29,7 @@ if __name__ == "__main__":
     # progress.join()
     # print("main progress end")
 
-    #使用线程池
+    # 使用线程池
     pool = multiprocessing.Pool(multiprocessing.cpu_count())
     # result = pool.apply_async(get_html, args=(3,))
     #
@@ -36,13 +39,10 @@ if __name__ == "__main__":
     #
     # print(result.get())
 
-    #imap
+    # imap
     # for result in pool.imap(get_html, [1,5,3]):
     #     print("{} sleep success".format(result))
 
-    for result in pool.imap_unordered(get_html, [1,5,3]):
+    for result in pool.imap_unordered(get_html, [1, 5, 3]):
         print("{} sleep success".format(result))
-
-
-
 

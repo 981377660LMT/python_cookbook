@@ -26,8 +26,6 @@ def get_detail_url(queue):
         print("get detail url end")
 
 
-# 1. 线程通信方式- 共享变量
-
 if __name__ == "__main__":
     detail_url_queue = Queue(maxsize=1000)
 

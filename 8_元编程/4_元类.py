@@ -12,6 +12,7 @@ User = type("User", (Base,), {})
 
 class MetaClassShouldExtendsType(type):
     def __new__(cls, *args, **kwargs):
+        # 也即type.__new__(cls, name, bases, attrs)
         return super().__new__(cls, *args, **kwargs)
 
 

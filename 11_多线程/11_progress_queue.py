@@ -20,8 +20,8 @@ from multiprocessing import Process, Queue, Pool, Manager, Pipe
 #     my_producer.join()
 #     my_consumer.join()
 
-#共享全局变量通信
-#共享全局变量不能适用于多进程编程，可以适用于多线程
+# 共享全局变量通信
+# 共享全局变量不能适用于多进程编程，可以适用于多线程
 
 
 # def producer(a):
@@ -41,8 +41,8 @@ from multiprocessing import Process, Queue, Pool, Manager, Pipe
 #     my_producer.join()
 #     my_consumer.join()
 
-#multiprocessing中的queue不能用于pool进程池
-#pool中的进程间通信需要使用manager中的queue
+# multiprocessing中的queue不能用于pool进程池
+# pool中的进程间通信需要使用manager中的queue
 
 # def producer(queue):
 #     queue.put("a")
@@ -63,8 +63,8 @@ from multiprocessing import Process, Queue, Pool, Manager, Pipe
 #     pool.close()
 #     pool.join()
 
-#通过pipe实现进程间通信
-#pipe的性能高于queue
+# 通过pipe实现进程间通信
+# pipe的性能高于queue
 
 # def producer(pipe):
 #     pipe.send("bobby")
@@ -83,8 +83,10 @@ from multiprocessing import Process, Queue, Pool, Manager, Pipe
 #     my_producer.join()
 #     my_consumer.join()
 
+
 def add_data(p_dict, key, value):
     p_dict[key] = value
+
 
 if __name__ == "__main__":
     progress_dict = Manager().dict()

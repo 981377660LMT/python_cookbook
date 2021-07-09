@@ -23,17 +23,19 @@ final_result = {}
 # if __name__ == '__main__':
 #     main()
 
+
 def sales_sum(pro_name):
     total = 0
     nums = []
     while True:
         x = yield
-        print(pro_name+"销量: ", x)
+        print(pro_name + "销量: ", x)
         if not x:
             break
         total += x
         nums.append(x)
     return total, nums
+
 
 if __name__ == "__main__":
     my_gen = sales_sum("bobby牌手机")
