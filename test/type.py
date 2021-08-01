@@ -5,5 +5,5 @@
 # Object.create({}, { p: { value: 42 } })
 Foo = type('Foo', (), {'bar': True})
 
-print(Foo)
+print(Foo.__mro__)
 
