@@ -80,3 +80,5 @@ class UpperAttrMetaclass(type):
     uppercase_attr = dict((name.upper(), value) for name, value in attrs)
     return super().__new__(cls, name, bases, uppercase_attr)
 ```
+getattribute 在最前面调用
+getattr 找不到时调用

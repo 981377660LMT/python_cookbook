@@ -25,7 +25,8 @@ def inlined_async(func):
         while True:
             result = result_queue.get()
             try:
-                a = f.send(result)
+                a: Async = f.send(result)
+                # 将生成器的yield放入result_queue
                 apply_async(a.func, a.args, callback=result_queue.put)
             except StopIteration:
                 break

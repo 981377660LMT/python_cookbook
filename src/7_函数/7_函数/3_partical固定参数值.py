@@ -13,6 +13,7 @@ points = [(1, 2), (3, 4), (2, 3), (1, 1)]
 # 到(2,2)的距离进行排序
 
 # 相当于points.sort(key=lambda point: distance(point, (2, 2)))
+# key仍然是Callable的
 points.sort(key=partial(distance, (2, 2)))
 
 print(points)
